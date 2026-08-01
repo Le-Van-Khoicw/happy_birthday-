@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const replayButton = document.getElementById('replayButton');
   const soundButton = document.getElementById('soundButton');
   const birthdayTrack = document.getElementById('birthdayTrack');
+  const finalePhoto = new Image();
+  finalePhoto.src = 'anh/anh-10.png';
   const lyricOverlay = document.getElementById('lyricOverlay');
   const lyricOriginal = document.getElementById('lyricOriginal');
   const lyricTranslation = document.getElementById('lyricTranslation');
@@ -284,6 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const elapsed = now - finaleStartedAt;
     ctx.clearRect(0, 0, innerWidth, innerHeight);
     const hue = 190 + Math.min(130, elapsed / 42);
+    drawHeartPhoto(elapsed);
     ctx.globalCompositeOperation = 'lighter';
     drawHeartAura(elapsed, hue);
     particles.forEach((p, index) => {
@@ -311,6 +314,45 @@ document.addEventListener('DOMContentLoaded', () => {
     drawPortal(elapsed, hue);
     ctx.globalCompositeOperation = 'source-over';
     animationId = requestAnimationFrame(animateHeart);
+  }
+
+  function drawHeartPhoto(elapsed) {
+    if (!finalePhoto.complete || !finalePhoto.naturalWidth) return;
+    const cx = innerWidth / 2;
+    const cy = innerHeight * .42;
+    const size = Math.min(innerWidth * .39, innerHeight * .19);
+    const reveal = Math.min(1, Math.max(0, (elapsed - 500) / 1700));
+    const eased = 1 - Math.pow(1 - reveal, 3);
+    const boxWidth = size * 2.22;
+    const boxHeight = size * 1.72;
+    const sourceRatio = finalePhoto.naturalWidth / finalePhoto.naturalHeight;
+    const targetRatio = boxWidth / boxHeight;
+    let sx = 0, sy = 0, sw = finalePhoto.naturalWidth, sh = finalePhoto.naturalHeight;
+
+    if (sourceRatio > targetRatio) {
+      sw = finalePhoto.naturalHeight * targetRatio;
+      sx = (finalePhoto.naturalWidth - sw) / 2;
+    } else {
+      sh = finalePhoto.naturalWidth / targetRatio;
+      sy = (finalePhoto.naturalHeight - sh) * .56;
+    }
+
+    ctx.save();
+    ctx.globalAlpha = eased * .9;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy + size * .82);
+    ctx.bezierCurveTo(cx - size * 1.25, cy + size * .18, cx - size * .88, cy - size * .85, cx, cy - size * .28);
+    ctx.bezierCurveTo(cx + size * .88, cy - size * .85, cx + size * 1.25, cy + size * .18, cx, cy + size * .82);
+    ctx.closePath();
+    ctx.clip();
+    const scale = .94 + eased * .06;
+    ctx.translate(cx, cy);
+    ctx.scale(scale, scale);
+    ctx.translate(-cx, -cy);
+    ctx.drawImage(finalePhoto, sx, sy, sw, sh, cx - boxWidth / 2, cy - boxHeight * .55, boxWidth, boxHeight);
+    ctx.fillStyle = `rgba(40,5,28,${.28 - eased * .16})`;
+    ctx.fillRect(cx - boxWidth / 2, cy - boxHeight * .55, boxWidth, boxHeight);
+    ctx.restore();
   }
 
   function drawHeartAura(elapsed, hue) {
