@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const canvas = document.getElementById('heartCanvas');
   const ctx = canvas.getContext('2d');
   const finalCopy = document.getElementById('finalCopy');
+  const heartSecret = document.getElementById('heartSecret');
   const replayButton = document.getElementById('replayButton');
   const soundButton = document.getElementById('soundButton');
   const birthdayTrack = document.getElementById('birthdayTrack');
@@ -22,12 +23,17 @@ document.addEventListener('DOMContentLoaded', () => {
   let scrapbookPage = 0;
   let scrapbookTimer = null;
   let scrapbookTransitioning = false;
+  let scrapbookHeld = false;
+  let scrapbookStartedAt = 0;
+  let swipeStartX = 0;
+  let swipeStartY = 0;
   const scrapbookPages = [...document.querySelectorAll('.scrap-page')];
   const scrapbookDots = document.getElementById('scrapDots');
   const scrapbook = document.getElementById('scrapbook');
 
   buildQrHeart();
   buildScrapbookDots();
+  bindScrapbookGestures();
 
   document.getElementById('startButton').addEventListener('click', () => {
     transition('memoryScene');
@@ -55,6 +61,15 @@ document.addEventListener('DOMContentLoaded', () => {
         p.vy += dy / distance * (190 - distance) * .055;
       }
     });
+    const heartX = innerWidth / 2;
+    const heartY = innerHeight * .42;
+    const heartSize = Math.min(innerWidth * .39, innerHeight * .19);
+    if (Math.hypot(x - heartX, (y - heartY) * 1.15) < heartSize * 1.05) {
+      canvas.classList.remove('heart-pulse');
+      void canvas.offsetWidth;
+      canvas.classList.add('heart-pulse');
+      heartSecret.classList.add('show');
+    }
     playSparkle();
   });
 
@@ -68,6 +83,8 @@ document.addEventListener('DOMContentLoaded', () => {
   replayButton.addEventListener('click', () => {
     cancelAnimationFrame(animationId);
     finalCopy.classList.remove('show');
+    heartSecret.classList.remove('show');
+    canvas.classList.remove('heart-pulse');
     replayButton.classList.remove('show');
     transition('introScene');
   });
@@ -109,6 +126,30 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  function bindScrapbookGestures() {
+    scrapbook.addEventListener('pointerdown', event => {
+      scrapbookHeld = true;
+      swipeStartX = event.clientX;
+      swipeStartY = event.clientY;
+      scrapbook.classList.add('is-held');
+      scrapbook.setPointerCapture?.(event.pointerId);
+    });
+
+    const finishGesture = event => {
+      if (!scrapbookHeld) return;
+      scrapbookHeld = false;
+      scrapbook.classList.remove('is-held');
+      const dx = event.clientX - swipeStartX;
+      const dy = event.clientY - swipeStartY;
+      if (Math.abs(dx) > 44 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+        showScrapbookPage(scrapbookPage + (dx < 0 ? 1 : -1));
+      }
+    };
+
+    scrapbook.addEventListener('pointerup', finishGesture);
+    scrapbook.addEventListener('pointercancel', finishGesture);
+  }
+
   function showScrapbookPage(index) {
     if (scrapbookTransitioning) return;
     const nextIndex = (index + scrapbookPages.length) % scrapbookPages.length;
@@ -139,7 +180,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function startScrapbook() {
     stopScrapbook();
-    scrapbookTimer = setInterval(() => showScrapbookPage(scrapbookPage + 1), 3600);
+    scrapbookStartedAt = performance.now();
+    let lastTarget = scrapbookPage;
+    scrapbookTimer = setInterval(() => {
+      if (scrapbookHeld || scrapbookTransitioning) return;
+      const seconds = audio?.track && !audio.track.paused
+        ? audio.track.currentTime
+        : ((performance.now() - scrapbookStartedAt) / 1000) % 28.8;
+      const target = seconds >= 24 ? 0 : seconds >= 18.2 ? 3 : seconds >= 12.5 ? 2 : seconds >= 7 ? 1 : 0;
+      if (target !== lastTarget) {
+        lastTarget = target;
+        showScrapbookPage(target);
+      }
+    }, 120);
   }
 
   function stopScrapbook() {
