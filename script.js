@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let scrapbookTimer = null;
   let scrapbookTransitioning = false;
   let scrapbookHeld = false;
-  let scrapbookStartedAt = 0;
+  let scrapbookNextAdvanceAt = 0;
   let swipeStartX = 0;
   let swipeStartY = 0;
   const scrapbookPages = [...document.querySelectorAll('.scrap-page')];
@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (index === 0) dot.classList.add('active');
       dot.addEventListener('click', () => {
         showScrapbookPage(index);
-        startScrapbook();
+        delayScrapbookAutoplay();
       });
       scrapbookDots.appendChild(dot);
     });
@@ -142,6 +142,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const dy = event.clientY - swipeStartY;
       if (Math.abs(dx) > 44 && Math.abs(dx) > Math.abs(dy) * 1.2) {
         showScrapbookPage(scrapbookPage + (dx < 0 ? 1 : -1));
+        delayScrapbookAutoplay();
+      } else if (Math.abs(dx) < 12 && Math.abs(dy) < 12) {
+        const rect = scrapbook.getBoundingClientRect();
+        showScrapbookPage(scrapbookPage + (event.clientX >= rect.left + rect.width / 2 ? 1 : -1));
+        delayScrapbookAutoplay();
       }
     };
 
@@ -179,19 +184,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function startScrapbook() {
     stopScrapbook();
-    scrapbookStartedAt = performance.now();
-    let lastTarget = scrapbookPage;
+    scrapbookNextAdvanceAt = performance.now() + 5000;
     scrapbookTimer = setInterval(() => {
       if (scrapbookHeld || scrapbookTransitioning) return;
-      const seconds = audio?.track && !audio.track.paused
-        ? audio.track.currentTime
-        : ((performance.now() - scrapbookStartedAt) / 1000) % 28.8;
-      const target = seconds >= 24 ? 0 : seconds >= 18.2 ? 3 : seconds >= 12.5 ? 2 : seconds >= 7 ? 1 : 0;
-      if (target !== lastTarget) {
-        lastTarget = target;
-        showScrapbookPage(target);
+      if (performance.now() >= scrapbookNextAdvanceAt) {
+        showScrapbookPage(scrapbookPage + 1);
+        scrapbookNextAdvanceAt = performance.now() + 5000;
       }
     }, 120);
+  }
+
+  function delayScrapbookAutoplay() {
+    scrapbookNextAdvanceAt = performance.now() + 5000;
   }
 
   function stopScrapbook() {
