@@ -19,8 +19,10 @@ document.addEventListener('DOMContentLoaded', () => {
   let lyricStartedAt = 0;
   let scrapbookPage = 0;
   let scrapbookTimer = null;
+  let scrapbookTransitioning = false;
   const scrapbookPages = [...document.querySelectorAll('.scrap-page')];
   const scrapbookDots = document.getElementById('scrapDots');
+  const scrapbook = document.getElementById('scrapbook');
 
   buildQrHeart();
   buildScrapbookDots();
@@ -106,14 +108,32 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function showScrapbookPage(index) {
+    if (scrapbookTransitioning) return;
+    const nextIndex = (index + scrapbookPages.length) % scrapbookPages.length;
+    if (nextIndex === scrapbookPage) return;
+
+    scrapbookTransitioning = true;
     const oldPage = scrapbookPages[scrapbookPage];
-    oldPage.classList.add('exit-left');
-    oldPage.classList.remove('active');
-    scrapbookPage = (index + scrapbookPages.length) % scrapbookPages.length;
-    const newPage = scrapbookPages[scrapbookPage];
-    newPage.classList.remove('exit-left');
-    requestAnimationFrame(() => newPage.classList.add('active'));
-    [...scrapbookDots.children].forEach((dot, dotIndex) => dot.classList.toggle('active', dotIndex === scrapbookPage));
+    const newPage = scrapbookPages[nextIndex];
+
+    scrapbook.classList.remove('circle-reveal');
+    void scrapbook.offsetWidth;
+    scrapbook.classList.add('circle-reveal');
+    oldPage.classList.add('zoom-away');
+    newPage.classList.remove('exit-left', 'zoom-away', 'reveal-page');
+
+    setTimeout(() => {
+      oldPage.classList.remove('active', 'zoom-away');
+      scrapbookPage = nextIndex;
+      newPage.classList.add('active', 'reveal-page');
+      [...scrapbookDots.children].forEach((dot, dotIndex) => dot.classList.toggle('active', dotIndex === scrapbookPage));
+    }, 390);
+
+    setTimeout(() => {
+      newPage.classList.remove('reveal-page');
+      scrapbook.classList.remove('circle-reveal');
+      scrapbookTransitioning = false;
+    }, 1050);
   }
 
   function startScrapbook() {
