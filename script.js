@@ -31,7 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const scrapbookDots = document.getElementById('scrapDots');
   const scrapbook = document.getElementById('scrapbook');
 
-  buildQrHeart();
   buildScrapbookDots();
   bindScrapbookGestures();
 
@@ -198,19 +197,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function stopScrapbook() {
     clearInterval(scrapbookTimer);
     scrapbookTimer = null;
-  }
-
-  function buildQrHeart() {
-    const grid = document.getElementById('qrGrid');
-    const count = 17 * 17;
-    for (let i = 0; i < count; i++) {
-      const cell = document.createElement('i');
-      const row = Math.floor(i / 17);
-      const col = i % 17;
-      const finder = ((row < 5 && col < 5) || (row < 5 && col > 11) || (row > 11 && col < 5));
-      if (!finder && Math.random() > .57) cell.className = 'off';
-      grid.appendChild(cell);
-    }
   }
 
   function startMusic() {
