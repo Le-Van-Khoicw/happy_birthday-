@@ -115,25 +115,24 @@ document.addEventListener('DOMContentLoaded', () => {
     scrapbookTransitioning = true;
     const oldPage = scrapbookPages[scrapbookPage];
     const newPage = scrapbookPages[nextIndex];
+    const movingForward = nextIndex > scrapbookPage || (scrapbookPage === scrapbookPages.length - 1 && nextIndex === 0);
+    const enterClass = movingForward ? 'pan-from-right' : 'pan-from-left';
+    const exitClass = movingForward ? 'pan-to-left' : 'pan-to-right';
 
-    scrapbook.classList.remove('circle-reveal');
+    newPage.classList.remove('pan-from-left', 'pan-from-right', 'pan-to-left', 'pan-to-right');
+    newPage.classList.add('active', enterClass, 'pan-prep');
     void scrapbook.offsetWidth;
-    scrapbook.classList.add('circle-reveal');
-    oldPage.classList.add('zoom-away');
-    newPage.classList.remove('exit-left', 'zoom-away', 'reveal-page');
+    newPage.classList.remove('pan-prep');
+    oldPage.classList.add(exitClass);
+    newPage.classList.remove(enterClass);
+
+    scrapbookPage = nextIndex;
+    [...scrapbookDots.children].forEach((dot, dotIndex) => dot.classList.toggle('active', dotIndex === scrapbookPage));
 
     setTimeout(() => {
-      oldPage.classList.remove('active', 'zoom-away');
-      scrapbookPage = nextIndex;
-      newPage.classList.add('active', 'reveal-page');
-      [...scrapbookDots.children].forEach((dot, dotIndex) => dot.classList.toggle('active', dotIndex === scrapbookPage));
-    }, 390);
-
-    setTimeout(() => {
-      newPage.classList.remove('reveal-page');
-      scrapbook.classList.remove('circle-reveal');
+      oldPage.classList.remove('active', exitClass);
       scrapbookTransitioning = false;
-    }, 1050);
+    }, 920);
   }
 
   function startScrapbook() {
