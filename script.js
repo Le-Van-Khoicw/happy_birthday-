@@ -286,7 +286,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const elapsed = now - finaleStartedAt;
     ctx.clearRect(0, 0, innerWidth, innerHeight);
     const hue = 190 + Math.min(130, elapsed / 42);
-    drawHeartPhoto(elapsed);
     ctx.globalCompositeOperation = 'lighter';
     drawHeartAura(elapsed, hue);
     particles.forEach((p, index) => {
@@ -313,6 +312,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     drawPortal(elapsed, hue);
     ctx.globalCompositeOperation = 'source-over';
+    // Paint the photo after additive light so its original colors stay intact.
+    drawHeartPhoto(elapsed);
+    drawHeartOutline(elapsed, hue);
     animationId = requestAnimationFrame(animateHeart);
   }
 
@@ -349,9 +351,27 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.translate(cx, cy);
     ctx.scale(scale, scale);
     ctx.translate(-cx, -cy);
+    ctx.filter = 'brightness(1.12) contrast(1.04) saturate(1.02)';
     ctx.drawImage(finalePhoto, sx, sy, sw, sh, cx - boxWidth / 2, cy - boxHeight * .55, boxWidth, boxHeight);
-    ctx.fillStyle = `rgba(40,5,28,${.28 - eased * .16})`;
-    ctx.fillRect(cx - boxWidth / 2, cy - boxHeight * .55, boxWidth, boxHeight);
+    ctx.restore();
+  }
+
+  function drawHeartOutline(elapsed, hue) {
+    const cx = innerWidth / 2;
+    const cy = innerHeight * .42;
+    const size = Math.min(innerWidth * .39, innerHeight * .19);
+    const power = Math.min(1, elapsed / 1800);
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(cx, cy + size * .82);
+    ctx.bezierCurveTo(cx - size * 1.25, cy + size * .18, cx - size * .88, cy - size * .85, cx, cy - size * .28);
+    ctx.bezierCurveTo(cx + size * .88, cy - size * .85, cx + size * 1.25, cy + size * .18, cx, cy + size * .82);
+    ctx.closePath();
+    ctx.strokeStyle = `hsla(${(hue + 70) % 360},100%,88%,${.78 * power})`;
+    ctx.lineWidth = 1.8;
+    ctx.shadowColor = `hsla(${(hue + 65) % 360},100%,72%,.85)`;
+    ctx.shadowBlur = 16;
+    ctx.stroke();
     ctx.restore();
   }
 
