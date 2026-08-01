@@ -1,80 +1,101 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Grand Birthday Surprise!</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#05030b">
+  <title>Một món quà nhỏ dành cho bạn</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <audio id="backgroundMusic" loop>
-        <source src="birthday_song.mp3" type="audio/mpeg">
-        Your browser does not support the audio element.
-    </audio>
-
-    <div class="step active" id="step1">
-        <div class="welcome-card">
-            <h1 class="welcome-title">You've got a surprise!</h1>
-            <p class="welcome-message">Click below to start your birthday journey...</p>
-            <button id="startButton" class="action-button">Start the Celebration!</button>
+  <main class="experience" aria-live="polite">
+    <section class="scene scene--intro active" id="introScene">
+      <div class="stars"></div>
+      <div class="intro-card">
+        <p class="eyebrow">MỘT TÍN HIỆU BÍ MẬT</p>
+        <div class="qr-heart" aria-label="Mã QR hình trái tim minh họa">
+          <div class="qr-grid" id="qrGrid"></div>
+          <span class="qr-core">♥</span>
         </div>
-    </div>
+        <h1>Có một món quà<br><span>đang chờ em</span></h1>
+        <button class="primary-button" id="startButton"><span>Chạm để mở</span><b>→</b></button>
+      </div>
+    </section>
 
-    <div class="step" id="step2">
-        <div class="envelope-container" id="envelopeContainer">
-            <div class="envelope">
-                <div class="envelope-back"></div>
-                <div class="envelope-front"></div>
-                <div class="envelope-flap"></div>
-                <div class="envelope-seal"></div>
+    <section class="scene scene--memory" id="memoryScene">
+      <div class="scrapbook-wrap">
+        <p class="scene-number">01 · CUỐN ALBUM NHỎ</p>
+        <div class="scrapbook" id="scrapbook">
+          <article class="scrap-page active" data-page="0">
+            <span class="tape tape--one"></span><span class="doodle">♡</span>
+            <div class="scrap-photo scrap-photo--hero placeholder-photo p1" style="background-image:url('anh/1785549002411_2064887984824643131_2925302892261270788_0659405b205ae558b331206855d1dfd3.jpg')"></div>
+            <div class="mini-film"><i></i><div class="placeholder-photo p2" style="background-image:url('anh/1785549002400_2064887984824643131_2925302892261270788_87c91106fc8fa323e11bfbab4d53da98.jpg')"></div><i></i></div>
+            <p class="hand-note">ngày mà mọi thứ<br>trở nên đáng nhớ ✦</p>
+            <span class="date-stamp">CHÚC MỪNG SINH NHẬT EM</span>
+          </article>
+          <article class="scrap-page" data-page="1">
+            <span class="star-sticker">★</span><span class="paper-grid"></span>
+            <div class="vinyl"><div class="placeholder-photo p3" style="background-image:url('anh/1785549002390_2064887984824643131_2925302892261270788_4a97dbb6e853f4e18b824a993da21a67.jpg')"></div></div>
+            <div class="scrap-photo scrap-photo--small placeholder-photo p4" style="background-image:url('anh/1785549002379_2064887984824643131_2925302892261270788_ea8b812175b0190d77989d5510af6622.jpg')"></div>
+            <div class="fake-message"><small>tin nhắn từ anh</small><p>Hôm nay em vui không? 💗</p></div>
+            <p class="korean-note">Tuổi mới luôn rạng rỡ nhé</p>
+          </article>
+          <article class="scrap-page" data-page="2">
+            <span class="tape tape--two"></span>
+            <div class="film-strip">
+              <div class="placeholder-photo p9" style="background-image:url('anh/anh-09.png')"></div>
+              <div class="placeholder-photo p6" style="background-image:url('anh/1785549002336_2064887984824643131_2925302892261270788_118a6106db948d28808697537d0c1ab7.jpg')"></div>
             </div>
-            <p class="click-instruction">Click the envelope!</p>
+            <p class="big-letter">CHÚC EM<br><em>một tuổi mới</em><br>RỰC RỠ</p>
+            <span class="scribble">───── ♡</span>
+          </article>
+          <article class="scrap-page" data-page="3">
+            <div class="final-photo placeholder-photo p8" style="background-image:url('anh/anh-08.png')"></div>
+            <div class="scrap-photo flower-photo placeholder-photo p7" style="background-image:url('anh/1785549002304_2064887984824643131_2925302892261270788_1f65e4bf6a082135d6a42952e6d1fb4c.jpg')"></div>
+            <span class="corner-heart">♥</span>
+            <p class="final-note">Cảm ơn vì đã xuất hiện<br>trong những ngày bình thường.</p>
+            <span class="tiny-stars">✦　✧　✦</span>
+          </article>
         </div>
-    </div>
-
-    <div class="step" id="step3">
-        <div class="letter-container" id="letterContainer">
-            <div class="letter">
-                <p>Dearest [Name],</p>
-                <p>This message carries wishes straight from the heart, ready to unfold into a memorable celebration just for you.</p>
-                <p>Click the button to reveal your special birthday surprise!</p>
-                <button id="unfoldButton" class="action-button">Unfold My Surprise!</button>
-            </div>
+        <div class="lyric-overlay" id="lyricOverlay" aria-live="polite">
+          <strong id="lyricOriginal"></strong>
+          <span id="lyricTranslation"></span>
         </div>
-    </div>
-
-    <div class="step" id="step4">
-        <div class="celebration-container">
-            <div class="fireworks-container"></div>
-            <div class="confetti-cannon-container"></div>
-            <div class="balloons-container"></div>
-
-            <div class="celebration-card">
-                <p class="sub-greeting">To the amazing</p>
-                <h1 class="main-greeting typewriter-text" id="finalGreeting">Happy Birthday,</h1>
-                <h2 class="recipient-name">Sapthesh!</h2>
-                <div class="cake-container">
-                    <div class="cake">
-                        <div class="plate"></div>
-                        <div class="layer layer-bottom"></div>
-                        <div class="layer layer-middle"></div>
-                        <div class="layer layer-top"></div>
-                        <div class="icing"></div>
-                        <div class="drip drip1"></div>
-                        <div class="drip drip2"></div>
-                        <div class="drip drip3"></div>
-                        <div class="candle">
-                            <div class="flame" id="candleFlame"></div>
-                        </div>
-                    </div>
-                </div>
-                <p class="final-wish">May your special day be filled with immense joy, laughter, and all the wonderful things life has to offer. Here's to another year of amazing adventures!</p>
-                <p class="signature">With love and best wishes <span class="heart-icon"></span></p>
-            </div>
+        <div class="scrap-controls">
+          <div class="scrap-dots" id="scrapDots" aria-label="Chọn trang album"></div>
+          <button class="ghost-button next-button" data-next="wishScene">Đi tới lời chúc <span>→</span></button>
         </div>
-    </div>
+      </div>
+    </section>
 
-    <script src="script.js"></script>
+    <section class="scene scene--wish" id="wishScene">
+      <div class="wish-card">
+        <p class="scene-number">02 · GỬI ĐẾN EM</p>
+        <div class="cake-icon" aria-hidden="true"><i></i><b></b><span></span></div>
+        <h2>Chúc mừng sinh nhật!</h2>
+        <p>Chúc em luôn vui, luôn đủ can đảm để theo đuổi điều mình thích và gặp thật nhiều điều tử tế trên chặng đường phía trước.</p>
+        <div class="signature">— Từ người luôn mong em hạnh phúc</div>
+        <button class="primary-button" id="finaleButton"><span>Mở điều cuối cùng</span><b>✦</b></button>
+      </div>
+    </section>
+
+    <section class="scene scene--finale" id="finaleScene">
+      <canvas id="heartCanvas"></canvas>
+      <div class="final-copy" id="finalCopy">
+        <p>VÀ ĐIỀU CUỐI CÙNG...</p>
+        <h2>Chúc mừng sinh nhật<br><span>Thanh Trà</span></h2>
+        <small>Chạm vào trái tim ✨</small>
+      </div>
+      <button class="sound-button" id="soundButton" aria-label="Bật hoặc tắt âm thanh">♫</button>
+      <button class="replay-button" id="replayButton">Xem lại ↻</button>
+    </section>
+  </main>
+
+  <audio id="birthdayTrack" preload="auto" loop>
+    <source src="birthday_song.mp3" type="audio/mpeg">
+  </audio>
+
+  <div class="rotate-hint"><span>↻</span><p>Xoay điện thoại dọc<br>để xem đẹp nhất nha</p></div>
+  <script src="script.js"></script>
 </body>
 </html>
